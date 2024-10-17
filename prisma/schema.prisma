@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model ChargingStation {
+    id                        String                     @id @default(uuid())
+    name                      String
+    chargingSessions          ChargingSession[]
+    isActive                  Boolean
+    createdAt                 DateTime?                  @default(now())
+    brand                     String
+    chargingStationCredential ChargingStationCredential?
+}
+
+model ChargingStationCredential {
+    id                       String          @id @default(uuid())
+    username                 String
+    password                 String
+    chargingStation          ChargingStation @relation(fields: [chargingStationId], references: [id])
+    chargingStationId        String          @unique
+    apiClientId              String?
+    apiClientSecret          String?
+    smappeeSerialIdMobileApp String?
+}
+
+model ChargingSession {
+    id                      String                   @id @default(uuid())
+    startedAt               DateTime                 @default(now())
+    endedAt                 DateTime?
+    updatedAt               DateTime                 @updatedAt
+    instructionStateChanges InstructionStateChange[]
+    chargingStateChanges    ChargingStateChange[]
+    ChargingStation         ChargingStation?         @relation(fields: [chargingStationId], references: [id])
+    chargingStationId       String?
+}
+
+model ChargingStateChange {
+    id                String          @id @default(uuid())
+    chargingSessionId String
+    chargingSession   ChargingSession @relation(fields: [chargingSessionId], references: [id])
+    state             String
+    changedAt         DateTime        @default(now())
+}
+
+model InstructionStateChange {
+    id                String          @id @default(uuid())
+    chargingSessionId String
+    ChargingSession   ChargingSession @relation(fields: [chargingSessionId], references: [id])
+    state             String
+    changedAt         DateTime        @default(now())
+}
+
+model SystemSetting {
+    id          String  @id @default(uuid())
+    key         String  @unique
+    stringValue String?
+    numberValue Float?
+    description String?
+}
+
+model HomeAssistantData {
+    id                     String   @id @default(uuid())
+    createdAt              DateTime @default(now())
+    inverterOutputInWatt   Float
+    powerConsumptionInWatt Float
+}
+
+model ChargingSpeed {
+    id          String   @id @default(uuid())
+    name        String // ENUM HA_CHARGE_INSTRUCTION
+    createdAt   DateTime @default(now())
+    unit        String
+    stringValue String?
+    numberValue Float?
+}
+
+model Post {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

@@ -1,0 +1,5 @@
+export enum STATION_CHARGE_STATE {
+  PAUSED = "PAUSED",
+  SLOW = "SLOW",
+  TURBO = "TURBO",
+}

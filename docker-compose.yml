@@ -1,0 +1,25 @@
+version: "3.8"
+services:
+  web:
+    container_name: ha-charging-station-control
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: file:./db.sqlite
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DESIGN: "hydra"
+    volumes:
+      - .:/var/www/html/data
+      - ./adminer/login-password-less.php:/var/www/html/plugins-enabled/login-password-less.php
+      - ./adminer/readable-dates.php:/var/www/html/plugins-enabled/readable-dates.php
